@@ -20,3 +20,10 @@ venv/
 # 临时文件
 *.tmp
 _pdf_extract.txt
+
+# 模型与大数据产物
+models/
+data/vectors/
+data/knowledge_base/
+*.npy
+*.npz
