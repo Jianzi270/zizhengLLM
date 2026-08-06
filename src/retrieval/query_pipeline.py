@@ -65,9 +65,9 @@ def enhance_query(question: str) -> str:
 
 def dc_rag_retrieve(question: str, top_c: int = 2, top_d: int = 3, top_k: int = 3) -> list[dict]:
     """C2：DC-RAG 三级检索（增强后查询）。"""
-    from src.embed.embed import embed_texts
+    from src.embed.embed import embed_queries
     kb = load_kb()
-    q = embed_texts([question])[0]
+    q = embed_queries([question])[0]
     idx = kb["index"]
     cat_vecs, doc_vecs, chunk_vecs = kb["category_vectors"], kb["doc_vectors"], kb["chunk_vectors"]
 
@@ -88,9 +88,9 @@ def dc_rag_retrieve(question: str, top_c: int = 2, top_d: int = 3, top_k: int = 
 
 def flat_retrieve(question: str, top_k: int = 3) -> list[dict]:
     """扁平检索基线：全库文本块直接 top-k（无层次结构）。"""
-    from src.embed.embed import embed_texts
+    from src.embed.embed import embed_queries
     kb = load_kb()
-    q = embed_texts([question])[0]
+    q = embed_queries([question])[0]
     scores = kb["chunk_vectors"] @ q
     hits = _topk(scores, top_k)
     return [{"chunk_id": kb["index"]["chunks"][i]["chunk_id"], "doc_id": kb["index"]["chunks"][i]["doc_id"],

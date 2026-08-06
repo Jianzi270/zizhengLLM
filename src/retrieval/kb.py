@@ -41,9 +41,9 @@ def _topk(scores: np.ndarray, k: int) -> list[tuple[int, float]]:
 
 def retrieve(query: str, top_c: int = 2, top_d: int = 3, top_k: int = 3) -> list[dict]:
     """三级检索：类别 → 文档 → 文本块，返回命中的文本块列表（含元数据与相似度）。"""
-    from src.embed.embed import embed_texts
+    from src.embed.embed import embed_queries
     kb = load_kb()
-    q = embed_texts([query])[0]
+    q = embed_queries([query])[0]
 
     idx = kb["index"]
     cat_vecs, doc_vecs, chunk_vecs = kb["category_vectors"], kb["doc_vectors"], kb["chunk_vectors"]

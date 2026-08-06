@@ -51,12 +51,21 @@ def load_model():
     return _model
 
 
+# BGE 系列检索建议：查询侧加指令前缀以提升检索效果（文档侧无需）
+QUERY_PREFIX = "为这个句子生成表示以用于检索相关文章："
+
+
 def embed_texts(texts: list[str]) -> np.ndarray:
     """批量向量化，返回 (n, dim) 的 float32 数组，默认归一化。"""
     model = load_model()
     cfg = load_config()
     vectors = model.encode(texts, batch_size=cfg["batch_size"], normalize_embeddings=cfg["normalize"])
     return np.asarray(vectors, dtype=np.float32)
+
+
+def embed_queries(texts: list[str]) -> np.ndarray:
+    """查询向量化：自动加 BGE 检索指令前缀（与文档侧区分）。"""
+    return embed_texts([QUERY_PREFIX + t for t in texts])
 
 
 def main():

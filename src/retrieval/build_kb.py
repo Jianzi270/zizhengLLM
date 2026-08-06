@@ -44,19 +44,29 @@ def main():
         n_clusters = max(n_clusters, d["cluster"] + 1)
     print(f"文档聚类: {len(clusters)} 篇, {n_clusters} 类")
 
-    # 3. 向量化文本块
+    # 3. 向量化文本块（若已有缓存则直接加载，避免重复耗时）
     from src.embed.embed import embed_texts
-    texts = [c["text"] for c in chunks]
-    chunk_vecs = embed_texts(texts)
-    print(f"文本块向量: {chunk_vecs.shape}")
+    chunk_vec_file = OUT_DIR / "chunk_vectors.npy"
+    if chunk_vec_file.exists():
+        chunk_vecs = np.load(chunk_vec_file)
+        print(f"加载缓存文本块向量: {chunk_vecs.shape}")
+    else:
+        texts = [c["text"] for c in chunks]
+        chunk_vecs = embed_texts(texts)
+        print(f"文本块向量: {chunk_vecs.shape}")
 
-    # 4. 文档代表向量（块均值）
+    # 4. 文档代表向量：使用 LLM 摘要向量（比块均值更能代表文档主题）
     doc_chunk_ids = defaultdict(list)
     for i, c in enumerate(chunks):
         doc_chunk_ids[c["doc_id"]].append(i)
     doc_ids = sorted(doc_chunk_ids)
-    doc_vecs = np.stack([chunk_vecs[doc_chunk_ids[doc]].mean(axis=0) for doc in doc_ids])
-    print(f"文档向量: {doc_vecs.shape}")
+    summaries = {}
+    for line in (PROJECT_ROOT / "data" / "processed" / "summaries.jsonl").read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            d = json.loads(line)
+            summaries[d["doc_id"]] = d["summary"]
+    doc_vecs = embed_texts([summaries.get(doc, "") for doc in doc_ids])
+    print(f"文档向量（摘要）: {doc_vecs.shape}")
 
     # 5. 类别代表向量（类内文档按软概率加权均值）
     prob = np.zeros((len(doc_ids), n_clusters))
