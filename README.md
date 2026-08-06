@@ -15,7 +15,11 @@
 ├── README.md                              # 项目说明（本文件）
 ├── .gitignore                             # 忽略规则
 ├── data/                                  # 数据
-│   └── gov_work_reports_sz_txt_cleaned/   # 清洗后政府工作报告语料（146 篇，2014-2025）
+│   ├── gov_work_reports_sz_txt_cleaned/   # 原始清洗语料（146 篇，2014-2025）
+│   ├── processed/cleaned/                 # 清洗后最终语料（160 篇，2001-2026）
+│   ├── raw/crawled/                       # 爬虫抓取原始文本（14 篇）
+│   ├── inventory/                         # 数据清单
+│   └── metadata/                          # 文档元数据
 ├── src/                                   # 核心源码
 │   ├── clean/                             # 数据清洗流水线（待建）
 │   ├── embed/                             # 文档切分与向量化（待建）

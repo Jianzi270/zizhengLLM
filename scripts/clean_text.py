@@ -160,6 +160,19 @@ def main():
     records = []
     for f in files:
         records.append(clean_file(f, out_dir / f.name))
+    # 合并历史报告（按文件名去重，保留最新记录），支持多次增量运行累积
+    if report_file.exists():
+        with report_file.open(encoding="utf-8-sig", newline="") as fp:
+            reader = csv.DictReader(fp)
+            old = {}
+            for r in reader:
+                r["removed_lines"] = int(r["removed_lines"])
+                r["removed_preamble"] = int(r["removed_preamble"])
+                r["nav_residue"] = r["nav_residue"] == "True"
+                r["suspicious_empty_body"] = r["suspicious_empty_body"] == "True"
+                old[r["filename"]] = r
+        old.update({r["filename"]: r for r in records})
+        records = sorted(old.values(), key=lambda r: r["filename"])
     with report_file.open("w", encoding="utf-8-sig", newline="") as fp:
         writer = csv.DictWriter(fp, fieldnames=list(records[0].keys()))
         writer.writeheader()

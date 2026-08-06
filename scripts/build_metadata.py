@@ -11,7 +11,8 @@ from collections import Counter
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DATA_DIR = PROJECT_ROOT / "data" / "gov_work_reports_sz_txt_cleaned"
+# 元数据基于清洗后的最终语料目录生成（含爬虫新增语料）
+DATA_DIR = PROJECT_ROOT / "data" / "processed" / "cleaned"
 OUT_DIR = PROJECT_ROOT / "data" / "metadata"
 OUT_FILE = OUT_DIR / "metadata.csv"
 
