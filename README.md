@@ -19,15 +19,21 @@
 │   ├── processed/cleaned/                 # 清洗后最终语料（160 篇，2001-2026）
 │   ├── raw/crawled/                       # 爬虫抓取原始文本（14 篇）
 │   ├── inventory/                         # 数据清单
-│   └── metadata/                          # 文档元数据
+│   ├── metadata/                          # 文档元数据
+│   └── export/                            # 数据集导出备份（dify_dataset.jsonl 等）
 ├── src/                                   # 核心源码
-│   ├── clean/                             # 数据清洗流水线（待建）
-│   ├── embed/                             # 文档切分与向量化（待建）
-│   ├── cluster/                           # GMM 软聚类（待建）
-│   └── retrieval/                         # DC-RAG 检索与生成（待建）
+│   ├── embed/                             # 文档切分与向量化（BGE 嵌入）
+│   ├── summarize/                         # 文档摘要生成（LLM 双模式）
+│   ├── cluster/                           # GMM 软聚类
+│   ├── retrieval/                         # DC-RAG 检索与生成（三级检索）
+│   └── generate/                          # 答案生成（C4 链路）
+├── app/                                   # 自研智能体 Web 应用（替代 Dify 平台）
+│   ├── server.py                          # Flask 服务（/api/ask 问答接口）
+│   └── templates/index.html               # 聊天界面
 ├── scripts/                               # 爬虫与工具脚本
-│   └── crawler/                           # 政策数据爬虫（待重建）
-├── dify/                                  # Dify 配置与数据集备份
+│   ├── crawler/                           # 政策数据爬虫
+│   └── export_dify_dataset.py             # 知识库数据集导出（Dify 兼容格式 + 备份）
+├── dify/                                  # Dify 配置（平台侧备选方案）
 │   └── Rag.yml                            # Dify advanced-chat 应用配置（已备份）
 └── docs/                                  # 项目文档
     ├── 资政大模型--大一年度项目立项报告 (1).pdf   # 立项报告
@@ -64,9 +70,31 @@
 
 - [x] 阶段 0：资产保全（git 仓库 + 远程备份 https://github.com/Jianzi270/zizhengLLM + 目录规范）
 - [x] 模块 A：数据层（A1 盘点 ✅ / A2 元数据 ✅ / A3 清洗流水线 ✅ / A4 爬虫 ✅）
-- [~] 模块 B：知识库构建（B1 嵌入模型 ✅ / B2 文档切分 ✅ / B3 摘要 ✅ / B4 GMM 聚类 ✅ / B5 树形知识库 ✅ / B6 导入 Dify）
-- [~] 模块 C：DC-RAG 检索与生成（C1 输入增强 ✅ / C2 DC-RAG 检索 ✅ / C3 质量评估 ✅ / C4 生成 ✅）
-- [ ] 模块 D：Agent 与应用（Dify）
+- [x] 模块 B：知识库构建（B1 嵌入模型 ✅ / B2 文档切分 ✅ / B3 摘要 ✅ / B4 GMM 聚类 ✅ / B5 树形知识库 ✅ / B6 数据集导出备份 ✅）
+- [x] 模块 C：DC-RAG 检索与生成（C1 输入增强 ✅ / C2 DC-RAG 检索 ✅ / C3 质量评估 ✅ / C4 生成 ✅）
+- [~] 模块 D：Agent 与应用（D1-D4 自研智能体 Web 应用 ✅（替代 Dify 平台，检索全本地、无需平台 API Key） / D5 安全与合规）
 - [ ] 模块 E：结题验收
 
 进度明细见 [docs/资政大模型-结题任务清单.md](docs/资政大模型-结题任务清单.md)。
+
+---
+
+## 运行智能体应用
+
+> **说明**：本项目以自研 DC-RAG 链路替代 Dify 平台的 API Key 依赖——检索环节完全本地（BGE 嵌入 + 层次化知识库），仅生成环节调用 `.env` 中的 LLM Key（DeepSeek）。
+
+```bash
+# 1. 配置 .env（已配置可跳过）：在项目根目录按 .env.example 填入 LLM_API_KEY / LLM_BASE_URL / LLM_MODEL
+# 2. 启动服务
+python app/server.py
+# 3. 浏览器访问 http://127.0.0.1:8000 开始对话
+```
+
+数据集导出备份（B6 交付物）：
+
+```bash
+python scripts/export_dify_dataset.py                 # 导出 Dify 兼容数据集（data/export/dify_dataset.jsonl）
+python scripts/export_dify_dataset.py --format chunks # 导出文本块备份（data/export/chunks_backup.jsonl）
+```
+
+> 若日后有 Dify 平台环境，可将 `data/export/dify_dataset.jsonl` 导入 Dify 数据集，并使用 `dify/Rag.yml` 作为平台侧应用（备选方案）。
