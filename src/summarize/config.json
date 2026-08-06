@@ -3,7 +3,8 @@
     "base_url": "https://api.openai.com/v1",
     "model": "gpt-4o-mini",
     "max_input_chars": 6000,
-    "timeout": 60
+    "timeout": 60,
+    "max_tokens": 1500
   },
   "extractive": {
     "num_sentences": 5

@@ -82,7 +82,7 @@ def call_llm(cfg: dict, title: str, text: str) -> str:
             {"role": "user", "content": PROMPT_TEMPLATE.format(title=title, text=text[: llm["max_input_chars"]])},
         ],
         "temperature": 0.3,
-        "max_tokens": 300,
+        "max_tokens": llm.get("max_tokens", 1500),
     }
     resp = requests.post(
         base_url.rstrip("/") + "/chat/completions",
@@ -91,7 +91,10 @@ def call_llm(cfg: dict, title: str, text: str) -> str:
         timeout=llm["timeout"],
     )
     resp.raise_for_status()
-    return resp.json()["choices"][0]["message"]["content"].strip()
+    content = resp.json()["choices"][0]["message"].get("content", "").strip()
+    if not content:
+        raise RuntimeError("LLM 返回内容为空（可能 max_tokens 不足或服务异常）")
+    return content
 
 
 def extractive_summary(text: str, num_sentences: int = 5) -> str:
@@ -149,7 +152,7 @@ def main():
                 return
             try:
                 summary = call_llm(cfg, Path(doc_id).stem, text)
-            except requests.RequestException as e:
+            except Exception as e:
                 failed.append((doc_id, str(e)))
                 print(f"  [{i}/{len(docs)}] 失败 {doc_id}: {e}")
                 continue
