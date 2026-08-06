@@ -83,12 +83,65 @@
 
 ---
 
+## 环境配置
+
+### 1. 环境要求
+
+- Python ≥ 3.9（64 位）
+- 磁盘空间：依赖与模型缓存约 2-3 GB（torch + BGE 嵌入模型）
+- 网络：安装依赖需联网；首次运行嵌入模型会自动从 HuggingFace 下载（约 100 MB，缓存到 `models/embedding/`）
+
+### 2. 安装依赖
+
+```bash
+# 可选：创建并激活虚拟环境（推荐）
+python -m venv .venv
+.venv\Scripts\activate
+
+# 安装依赖（网络受限时加国内镜像，如清华源）
+pip install -r requirements.txt
+# 备选：pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
+> 依赖清单：`requests`、`beautifulsoup4`、`pymupdf`、`numpy`、`sentence-transformers`、`torch`、`flask`。
+
+### 3. 配置 LLM API Key（.env）
+
+项目使用 OpenAI 兼容接口调用生成大模型（DeepSeek / Moonshot / OpenAI 等），**只需生成环节的 Key**，检索环节完全本地。
+
+```bash
+# 1. 复制模板为 .env（.env 已被 .gitignore 忽略，不会提交）
+copy .env.example .env
+# 2. 编辑 .env，填入三个变量：
+#    LLM_API_KEY=sk-你的Key          # 必填
+#    LLM_BASE_URL=https://api.deepseek.com/v1   # 服务地址（DeepSeek/Moonshot/OpenAI 等）
+#    LLM_MODEL=deepseek-chat         # 模型名（如 deepseek-chat、moonshot-v1-8k、gpt-4o-mini）
+```
+
+> 本项目实测使用：`LLM_BASE_URL=https://api.deepseek.com/v1`、`LLM_MODEL=deepseek-v4-flash`（推理模型，`max_tokens` 需 ≥1500，已在代码中配置）。
+>
+> **注意**：`.env` 含密钥，绝不提交；`LLM_API_KEY` 缺失时，检索/清洗等本地流程仍可用，仅增强与生成环节会回退或报错提示。
+
+### 4. 验证环境就绪
+
+```bash
+# 嵌入模型自测：加载 BGE 模型并验证相似度（首次运行会下载模型）
+python -m src.embed.embed --test
+
+# 端到端联调（快速模式，不调 LLM）：数据层/知识库/检索/应用逐层检查
+python scripts/e2e_check.py
+```
+
+自检输出示例：`向量形状: (3, 512)`、`相似度自检通过 ✓`，即环境就绪。
+
+---
+
 ## 运行智能体应用
 
 > **说明**：本项目以自研 DC-RAG 链路替代 Dify 平台的 API Key 依赖——检索环节完全本地（BGE 嵌入 + 层次化知识库），仅生成环节调用 `.env` 中的 LLM Key（DeepSeek）。
 
 ```bash
-# 1. 配置 .env（已配置可跳过）：在项目根目录按 .env.example 填入 LLM_API_KEY / LLM_BASE_URL / LLM_MODEL
+# 1. 环境配置见上方"环境配置"章节（依赖安装 + .env 填写）
 # 2. 启动服务
 python app/server.py
 # 3. 浏览器访问 http://127.0.0.1:8000 开始对话
