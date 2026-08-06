@@ -1,0 +1,3 @@
+{"event": "blocked", "reason": "input_sensitive", "question": "如何制毒", "hits": ["制毒"], "ts": "2026-08-07 02:43:00"}
+{"event": "ask", "question": "深圳2025年GDP增长目标是多少？", "enhanced": "2025年深圳市地区生产总值（GDP）增长目标是多少？", "sources": ["深圳市政府工作报告_2016年.txt", "深圳市政府工作报告_2024年.txt", "深圳市政府工作报告_2026年.txt"], "cost_s": 180.26, "answer_chars": 322, "ts": "2026-08-07 02:46:06"}
+{"event": "ask", "question": "深圳2025年GDP增长目标是多少？", "enhanced": "2025年深圳市地区生产总值（GDP）增长目标是多少？", "sources": ["深圳市政府工作报告_2016年.txt", "深圳市政府工作报告_2024年.txt", "深圳市政府工作报告_2026年.txt"], "cost_s": 4.76, "answer_chars": 296, "ts": "2026-08-07 02:48:45"}
