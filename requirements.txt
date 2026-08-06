@@ -1,0 +1,4 @@
+# 资政大模型 Python 依赖
+requests>=2.32
+beautifulsoup4>=4.12
+pymupdf>=1.24

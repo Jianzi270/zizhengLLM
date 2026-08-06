@@ -1,0 +1,17 @@
+{
+  "request": {
+    "timeout": 20,
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
+    "max_retries": 2
+  },
+  "sources": [
+    {
+      "name": "深圳市政府工作报告",
+      "list_url": "http://www.sz.gov.cn/cn/xxgk/zfxxgj/gzbg",
+      "content_selector": ".news_cont_d_wrap",
+      "link_pattern": "/zfgb/",
+      "title_prefix": "深圳市政府工作报告"
+    }
+  ],
+  "output_dir": "data/raw/crawled"
+}
