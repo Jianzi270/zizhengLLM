@@ -1,0 +1,12 @@
+{
+  "llm": {
+    "base_url": "https://api.openai.com/v1",
+    "model": "gpt-4o-mini",
+    "max_input_chars": 6000,
+    "timeout": 60
+  },
+  "extractive": {
+    "num_sentences": 5
+  },
+  "output_file": "data/processed/summaries.jsonl"
+}
